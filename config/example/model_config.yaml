@@ -1,0 +1,56 @@
+# LLM 模型配置
+# 复制此文件到 config/model_config.yaml 并填写真实的 API keys
+
+models:
+  # ======== OpenAI ========
+  "gpt-4o":
+    base_url: "https://api.openai.com/v1"
+    api_key: "sk-xxx"
+    temperature: 1
+    top_p: 1
+
+  "gpt-4o-mini":
+    base_url: "https://api.openai.com/v1"
+    api_key: "sk-xxx"
+
+  "o3-mini":
+    base_url: "https://api.openai.com/v1"
+    api_key: "sk-xxx"
+
+  # ======== Google Gemini ========
+  "gemini-2.5-flash":
+    base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key: "your-gemini-api-key"
+
+  "gemini-2.5-pro":
+    base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key: "your-gemini-api-key"
+
+  "gemini-2.5-flash-image":
+    base_url: "https://generativelanguage.googleapis.com/v1beta/openai/"
+    api_key: "your-gemini-api-key"
+
+  # ======== Anthropic Claude ========
+  "claude-4-sonnet":
+    base_url: "https://api.anthropic.com/v1"
+    api_key: "your-anthropic-api-key"
+
+  "claude-4-5-sonnet":
+    base_url: "https://api.anthropic.com/v1"
+    api_key: "your-anthropic-api-key"
+
+  # ======== DeepSeek ========
+  "deepseek-chat":
+    base_url: "https://api.deepseek.com/v1"
+    api_key: "your-deepseek-api-key"
+
+  "deepseek-reasoner":
+    base_url: "https://api.deepseek.com/v1"
+    api_key: "your-deepseek-api-key"
+
+  # ======== 其他兼容 OpenAI API 的服务 ========
+  # "custom-model":
+  #   base_url: "https://your-api-endpoint/v1"
+  #   api_key: "your-api-key"
+  #   temperature: 0.7
+  #   top_p: 0.9

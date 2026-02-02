@@ -1,0 +1,102 @@
+# ========== 敏感文件 ==========
+.env
+.env.*
+!.env.example
+*.env.local
+
+# ========== 配置文件（保留 example 目录）==========
+/config/benchmarks/
+/config/model_config.yaml
+/config/global_config.yaml
+/config/global_config2.yaml
+benchmark/interactcomp/config/infra_config.yaml
+
+# ========== Python ==========
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ========== 虚拟环境 ==========
+.venv/
+venv/
+ENV/
+env/
+
+# ========== IDE ==========
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# ========== macOS ==========
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# ========== 日志和输出 ==========
+*.log
+logs/
+/workspace/
+/workspace/experiments
+/workspace/logs
+/workspace/.exec
+/workspace/MATH
+/workspace/Poem
+/workspace/bak
+
+# ========== 数据集（大文件）==========
+benchmark/gaia/data/
+benchmark/terminalbench/terminal-bench/
+benchmark/swebench/SWE-bench_Verified/
+.vscode/benchmark/swebench/SWE-bench_Verified/
+
+# ========== 训练数据和输出 ==========
+training_data/outputs/
+training_data/taskcraft/outputs/
+extracted_data/
+extracted_files/
+
+# ========== 媒体和文档文件 ==========
+*.pdf
+*.csv
+*.tsv
+*.xlsx
+*.mp4
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.pgm
+*.ppm
+
+# ========== 其他 ==========
+arxiv_lat.html
+/benchmark/interactcomp/docs
+/learn/extend/origins
+/agents/extend
+
+# ========== 临时文件 ==========
+*.tmp
+*.temp
+*.bak
+*.cache
+.cache/

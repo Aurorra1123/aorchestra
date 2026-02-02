@@ -1,0 +1,50 @@
+# Terminal Bench 2.0 Configuration
+
+# Path to directory containing Terminal Bench 2.0 tasks
+# Download the dataset first using: python run_terminalbench.py --download
+# The repository root contains all tasks directly
+tasks_dir: "benchmark/terminalbench/terminal-bench/test"
+
+# Maximum number of steps per task  
+max_steps: 30
+
+# Maximum number of tasks to run (null = all tasks)
+max_tasks: 3
+
+# Docker command timeout in seconds
+docker_timeout: 600
+
+# Sandbox type: "docker", "e2b", or "daytona"
+# - "docker": Use local Docker containers (default)
+# - "e2b": Use E2B cloud sandboxes (requires E2B API key)
+# - "daytona": Use Daytona cloud sandboxes (requires Daytona API key)
+sandbox: "e2b"
+
+# E2B API key (only needed when sandbox: "e2b")
+# If not set here, will use E2B_API_KEY environment variable
+# Get your API key from: https://e2b.dev/
+e2b_api_key: ""
+
+# Daytona API key (only needed when sandbox: "daytona")
+# Get your API key from: https://daytona.io/
+daytona_api_key: ""
+daytona_api_url: ""  # Optional: Custom Daytona API URL
+daytona_target: ""   # Optional: Target region
+
+# Model to use (required for run_terminalbench.py)
+# Examples: "gpt-4", "gpt-3.5-turbo", "claude-3-opus-20240229", etc.
+model: "gemini-2.5-flash"
+
+# Output base directory
+# All outputs will be saved in: {result_folder}/terminalbench_{timestamp}/
+#   ├── results.csv              # Summary results
+#   └── trajectories/            # JSON trajectories for each task
+result_folder: "workspace/logs"
+
+#init env variable for sandbox
+env_init: {
+  # "http_proxy": "http://127.0.0.1:7890",
+  # "https_proxy": "http://127.0.0.1:7890",
+  # "all_proxy": "http://127.0.0.1:7890",
+}
+
