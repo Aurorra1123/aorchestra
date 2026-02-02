@@ -1,6 +1,8 @@
-# FoundationAgent-Dev
+# aorchestra
 
-AI Agent evaluation framework, supporting GAIA, SWE-bench, and TerminalBench benchmarks.
+Multi-agent evaluation framework (MainAgent + SubAgent) for GAIA, SWE-bench, and TerminalBench.
+
+> Note: legacy Base/standard single-agent entry points were removed. Use the aorchestra runners below.
 
 ## Quick Start
 
@@ -19,7 +21,7 @@ vim .env
 vim config/model_config.yaml
 
 # 4. Run
-python bench_gaia.py --config config/benchmarks/gaia.yaml
+python bench_aorchestra_gaia.py --config config/benchmarks/aorchestra_gaia.yaml
 ```
 
 ---
@@ -51,7 +53,7 @@ python bench_gaia.py --config config/benchmarks/gaia.yaml
 ```
 .env                          # Tool API keys (JINA, SERPER, E2B)
 config/model_config.yaml      # LLM API keys
-config/benchmarks/*.yaml      # Benchmark parameters
+config/benchmarks/aorchestra_*.yaml  # Benchmark parameters
 ```
 
 **Copy from templates:**
@@ -65,15 +67,20 @@ cp -r config/example/benchmarks config/
 
 ## Run Commands
 
-| Mode | GAIA | SWE-bench | TerminalBench |
-|------|------|-----------|---------------|
-| Standard | `python bench_gaia.py` | `python bench_swebench.py` | `python bench_terminalbench.py` |
-| Orchestra | `python bench_aorchestra_gaia.py` | `python bench_aorchestra_swebench.py` | `python bench_aorchestra_terminalbench.py` |
+| Benchmark | Command |
+|-----------|---------|
+| **GAIA** | `python bench_aorchestra_gaia.py --config config/benchmarks/aorchestra_gaia.yaml` |
+| **SWE-bench** | `python bench_aorchestra_swebench.py --config config/benchmarks/aorchestra_swebench.yaml` |
+| **TerminalBench** | `python bench_aorchestra_terminalbench.py --config config/benchmarks/aorchestra_terminalbench.yaml` |
 
-**Common parameters:**
+**Common parameters (all benchmarks):**
 ```bash
---config config/benchmarks/xxx.yaml    # Config file
---max-concurrency 5                     # Concurrency
---tasks task1,task2                     # Specify tasks (optional)
+--config config/benchmarks/xxx.yaml   # Config file
+--max_concurrency 5                    # Concurrency override
+--tasks task1,task2                    # Specify tasks/instance IDs (optional)
 ```
 
+**Benchmark-specific options:**
+- GAIA: `--skip_completed <path/to/results.csv>`
+- SWE-bench: `--skip-completed`
+- TerminalBench: `--skip_completed`
