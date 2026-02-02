@@ -26,7 +26,7 @@ class MainAgent(BaseAgent):
     max_attempts: int = Field(default=10)
     benchmark_type: str = Field(default="terminalbench")  # "gaia" | "terminalbench"
     
-    # 模型名遮蔽（可选）
+    # Model name masking (optional)
     mask_model_names: bool = Field(default=False)
     model_to_alias: Dict[str, str] = Field(default_factory=dict)
     alias_to_model: Dict[str, str] = Field(default_factory=dict)
@@ -46,7 +46,7 @@ class MainAgent(BaseAgent):
     
     def __init__(self, **data):
         super().__init__(**data)
-        # 设置模型名遮蔽
+        # Set up model name masking
         if self.mask_model_names and self.sub_models:
             self.model_to_alias = {
                 model: f"model_{i+1}" for i, model in enumerate(self.sub_models)
@@ -71,7 +71,7 @@ class MainAgent(BaseAgent):
         return self.llm.get_usage_summary().get("total_cost", 0.0)
     
     def _get_tools_description(self) -> str:
-        """生成工具描述文本"""
+        """Generate tool description text"""
         if not self.tools:
             return "No tools available."
         return "\n\n".join([
@@ -80,7 +80,7 @@ class MainAgent(BaseAgent):
         ])
     
     def _format_subtask_history(self) -> str:
-        """生成 subtask history 供 prompt 使用"""
+        """Generate subtask history for prompt usage"""
         if not self.task_entries:
             return "No subtasks completed yet."
         
@@ -94,7 +94,7 @@ class MainAgent(BaseAgent):
             steps_info = f'{e.get("steps_taken", "?")}/{e.get("max_steps", 30)}'
             model_display = e.get("model", "?")
             
-            # 模型名遮蔽
+            # Model name masking
             if self.mask_model_names and model_display in self.model_to_alias:
                 model_display = self.model_to_alias[model_display]
             
@@ -103,13 +103,13 @@ class MainAgent(BaseAgent):
                 f'├─ Task: {e.get("instruction", "N/A")}',
             ]
             
-            # GAIA 格式
+            # GAIA format
             if self.benchmark_type == "gaia":
                 result_str = f'"{e.get("result", "")}"' if e.get("result") and e.get("result") != "-" else "(no result)"
                 entry_lines.append(f'├─ Result: {result_str}')
                 if e.get("summary"):
                     entry_lines.append(f'├─ Summary: {e["summary"]}')
-            # TerminalBench 格式
+            # TerminalBench format
             else:
                 if e.get("message"):
                     entry_lines.append(f'├─ Message: {e["message"]}')
@@ -134,7 +134,7 @@ class MainAgent(BaseAgent):
             if e["status"] == "done":
                 done_count += 1
         
-        # 汇总
+        # Summary
         summary_lines = [f"---", f"Summary: {done_count}/{len(self.task_entries)} subtasks done"]
         if self.benchmark_type == "terminalbench":
             if all_completed:
@@ -242,13 +242,13 @@ Return JSON: {{"action": "...", "reasoning": "...", "params": {{...}}}}"""
                     summary += f"  Issues: {finish['issues']}\n"
                 if finish.get('message'):
                     summary += f"  Message: {finish.get('message')}\n"
-                # GAIA 格式
+                # GAIA format
                 if finish.get('result'):
                     summary += f"  Result: {finish.get('result')}\n"
             else:
                 summary += f"  Steps: {result.get('steps_taken', 0)}, Done: {result.get('done', False)}\n"
             
-            # 构建 task_entry
+            # Build task_entry
             finish_result = result.get('finish_result', {})
             if finish_result:
                 entry_status = finish_result.get('status', 'partial')

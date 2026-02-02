@@ -9,7 +9,7 @@ from base.agent.base_action import BaseAction
 from base.engine.async_llm import LLMsConfig
 
 
-## 图像工具
+## Image Tools
 class ImageAnalysisAction(BaseAction):
     name: str = "ImageAnalysisAction"
     description: str = (
@@ -115,7 +115,7 @@ class ImageAnalysisAction(BaseAction):
 
         return {"success": True, "output": content.strip(), "error": None, "metrics": {}}
 
-## 语音工具
+## Audio Tools
 class ParseAudioAction(BaseAction):
     name: str = "ParseAudioAction"
     description: str = (

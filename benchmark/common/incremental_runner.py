@@ -33,7 +33,7 @@ class IncrementalRunner(Runner):
 
     async def run(self, agent: BaseAgent, env: Environment) -> LevelResult:
         """Run with trajectory saving."""
-        # 记录任务开始时间
+        # Record task start time
         start_time = datetime.now().isoformat()
         
         info = env.get_basic_info()
@@ -80,7 +80,7 @@ class IncrementalRunner(Runner):
             if done:
                 break
 
-        # 记录任务结束时间
+        # Record task end time
         end_time = datetime.now().isoformat()
 
         # Build result

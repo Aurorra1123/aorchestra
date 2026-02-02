@@ -22,17 +22,17 @@ class GAIAMainAgentPrompt:
         """Generate a pricing table for available sub-models.
         
         Args:
-            sub_models: 模型别名列表（如 model_1, model_2）或真实模型名列表
-            model_to_alias: 真实模型名 -> 别名的映射，用于查询价格
+            sub_models: Model alias list (e.g., model_1, model_2) or real model name list
+            model_to_alias: Real model name -> alias mapping, used to query price
         """
         lines = ["| Model | Input $/1K | Output $/1K |"]
         lines.append("|-------|-----------|------------|")
         
-        # 如果有映射，需要反向查找真实模型名来获取价格
+        # If mapping exists, need to reverse lookup real model name for pricing
         alias_to_model = {v: k for k, v in model_to_alias.items()} if model_to_alias else {}
         
         for model_display in sub_models:
-            # 获取真实模型名（用于查询价格）
+            # Get real model name (for price lookup)
             real_model = alias_to_model.get(model_display, model_display)
             input_price = ModelPricing.get_price(real_model, "input")
             output_price = ModelPricing.get_price(real_model, "output")
@@ -52,7 +52,7 @@ class GAIAMainAgentPrompt:
         subtask_history: str = "",
         model_to_alias: Dict[str, str] = None,
     ) -> str:
-        remaining_attempts = max_attempts - attempt_index  # 当前attempt之后还剩多少次
+        remaining_attempts = max_attempts - attempt_index  # Remaining attempts after current one
         model_pricing_table = GAIAMainAgentPrompt._build_model_pricing_table(sub_models, model_to_alias)
         
         return f"""

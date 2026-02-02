@@ -1,37 +1,37 @@
 # GAIA Benchmark Configuration (Orchestra Mode)
-# 用于 bench_aorchestra_gaia.py (MainAgent + SubAgent 模式)
+# For bench_aorchestra_gaia.py (MainAgent + SubAgent mode)
 
-# ======== 模型配置 ========
-# MainAgent 使用的模型（负责任务分解和协调）
+# ======== Model Configuration ========
+# Model used by MainAgent (responsible for task decomposition and coordination)
 main_model: "gemini-2.5-flash"
 
-# SubAgent 使用的模型列表（负责执行具体子任务）
-# 可以配置多个不同模型，系统会自动分配
+# List of models used by SubAgent (responsible for executing specific subtasks)
+# Can configure multiple different models, system will auto-assign
 sub_models:
   - "gemini-2.5-flash"
-  # - "deepseek-chat"     # 可以添加更多模型
+  # - "deepseek-chat"     # Can add more models
 
-# ======== 数据集配置 ========
+# ======== Dataset Configuration ========
 dataset_path: "benchmark/gaia/data/Gaia/2023/validation/metadata.jsonl"
 attachments_dir: "benchmark/gaia/data/Gaia/2023/validation"
 
-# 任务筛选
-level_filter: null       # null = 全部, 或 1/2/3/[1,2] 等
+# Task filtering
+level_filter: null       # null = all, or 1/2/3/[1,2] etc.
 
-# ======== 任务限制 ========
-# 运行的任务数量
+# ======== Task Limits ========
+# Number of tasks to run
 max_tasks: 10
 
-# 每个任务的最大尝试次数
+# Maximum attempts per task
 max_attempts: 10
 
-# 并发执行的任务数
+# Number of concurrent tasks
 max_concurrency: 3
 
-# ======== 输出配置 ========
+# ======== Output Configuration ========
 result_folder: "workspace/logs/gaia_aorchestra"
 trajectory_folder: "workspace/logs/gaia_aorchestra/trajectories"
 
-# ======== 所需环境变量 ========
-# .env 文件中需要配置:
+# ======== Required Environment Variables ========
+# Configure in .env file:
 #   JINA_API_KEY, SERPER_API_KEY, OPENAI_API_KEY

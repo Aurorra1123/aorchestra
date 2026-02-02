@@ -1,12 +1,12 @@
 """
-向后兼容的导入代理
+Backward compatible import proxy
 
-OrchestraSubAgent 已移动到 aorchestra.subagents.react_agent.ReActAgent
-此文件保持向后兼容性。
+OrchestraSubAgent has been moved to aorchestra.subagents.react_agent.ReActAgent
+This file maintains backward compatibility.
 """
 from aorchestra.subagents.react_agent import ReActAgent
 
-# 向后兼容别名
+# Backward compatibility alias
 OrchestraSubAgent = ReActAgent
 
 __all__ = ["OrchestraSubAgent", "ReActAgent"]

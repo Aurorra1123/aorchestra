@@ -377,7 +377,7 @@ class TerminalBenchRunner(IncrementalRunner):
                 model=getattr(agent.llm, "model_name", "unknown"),
                 total_reward=0.0,
                 steps=0,
-                done=False,  # 失败任务标记为 done=False
+                done=False,  # Mark failed tasks as done=False
                 trace=[StepRecord(
                     observation={"error": str(e)},
                     action={"error": "task_failed"},
@@ -388,7 +388,7 @@ class TerminalBenchRunner(IncrementalRunner):
                 )],
                 cost=0.0,
             )
-            # 记录失败任务到 CSV
+            # Record failed task to CSV
             if self.csv_summary_path:
                 self._append_csv_row(info.env_id, result)
             return result

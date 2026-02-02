@@ -1,60 +1,60 @@
 # FoundationAgent-Dev
 
-AI Agent 评测框架，支持 GAIA、SWE-bench、TerminalBench 基准测试。
+AI Agent evaluation framework, supporting GAIA, SWE-bench, and TerminalBench benchmarks.
 
-## 快速开始
+## Quick Start
 
 ```bash
-# 1. 安装
+# 1. Install
 conda create -n orchestra python=3.11 && conda activate orchestra
 pip install -r requirements.txt
 
-# 2. 配置
+# 2. Configure
 cp .env.example .env
 cp config/example/model_config.yaml config/
 cp -r config/example/benchmarks config/
 
-# 3. 编辑配置文件，填入 API keys
+# 3. Edit config files, fill in API keys
 vim .env
 vim config/model_config.yaml
 
-# 4. 运行
+# 4. Run
 python bench_gaia.py --config config/benchmarks/gaia.yaml
 ```
 
 ---
 
-## API Keys 配置表
+## API Keys Configuration Table
 
-### 按 Benchmark 分类
+### By Benchmark
 
-| Benchmark | 必需 API Keys | 可选 |
-|-----------|--------------|------|
+| Benchmark | Required API Keys | Optional |
+|-----------|------------------|----------|
 | **GAIA** | `JINA_API_KEY`, `SERPER_API_KEY`, LLM | - |
 | **SWE-bench** | LLM, Docker | - |
-| **TerminalBench** | LLM, Docker 或 `E2B_API_KEY` | `DAYTONA_API_KEY` |
+| **TerminalBench** | LLM, Docker or `E2B_API_KEY` | `DAYTONA_API_KEY` |
 
-### 按工具分类
+### By Tool
 
-| 工具 | 环境变量 | 用途 | 获取地址 |
-|-----|---------|------|---------|
-| Jina | `JINA_API_KEY` | 网页内容提取 | https://jina.ai/ |
-| Serper | `SERPER_API_KEY` | Google 搜索 | https://serper.dev/ |
-| E2B | `E2B_API_KEY` | 云沙箱 | https://e2b.dev/ |
-| Daytona | `DAYTONA_API_KEY` | 云沙箱 | https://daytona.io/ |
-| LLM | 在 `config/model_config.yaml` 配置 | 模型调用 | OpenAI/Gemini/Claude 等 |
+| Tool | Environment Variable | Purpose | Obtain From |
+|------|---------------------|---------|-------------|
+| Jina | `JINA_API_KEY` | Web content extraction | https://jina.ai/ |
+| Serper | `SERPER_API_KEY` | Google search | https://serper.dev/ |
+| E2B | `E2B_API_KEY` | Cloud sandbox | https://e2b.dev/ |
+| Daytona | `DAYTONA_API_KEY` | Cloud sandbox | https://daytona.io/ |
+| LLM | Configure in `config/model_config.yaml` | Model calls | OpenAI/Gemini/Claude etc. |
 
 ---
 
-## 配置文件
+## Configuration Files
 
 ```
-.env                          # 工具 API keys (JINA, SERPER, E2B)
+.env                          # Tool API keys (JINA, SERPER, E2B)
 config/model_config.yaml      # LLM API keys
-config/benchmarks/*.yaml      # Benchmark 参数
+config/benchmarks/*.yaml      # Benchmark parameters
 ```
 
-**从模板复制：**
+**Copy from templates:**
 ```bash
 cp .env.example .env
 cp config/example/model_config.yaml config/
@@ -63,18 +63,17 @@ cp -r config/example/benchmarks config/
 
 ---
 
-## 运行命令
+## Run Commands
 
-| 模式 | GAIA | SWE-bench | TerminalBench |
-|-----|------|-----------|---------------|
-| 普通 | `python bench_gaia.py` | `python bench_swebench.py` | `python bench_terminalbench.py` |
+| Mode | GAIA | SWE-bench | TerminalBench |
+|------|------|-----------|---------------|
+| Standard | `python bench_gaia.py` | `python bench_swebench.py` | `python bench_terminalbench.py` |
 | Orchestra | `python bench_aorchestra_gaia.py` | `python bench_aorchestra_swebench.py` | `python bench_aorchestra_terminalbench.py` |
 
-**通用参数：**
+**Common parameters:**
 ```bash
---config config/benchmarks/xxx.yaml    # 配置文件
---max-concurrency 5                     # 并发数
---tasks task1,task2                     # 指定任务（可选）
+--config config/benchmarks/xxx.yaml    # Config file
+--max-concurrency 5                     # Concurrency
+--tasks task1,task2                     # Specify tasks (optional)
 ```
-
 

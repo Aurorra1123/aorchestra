@@ -1,4 +1,4 @@
-"""公共工具函数"""
+"""Common utility functions"""
 from __future__ import annotations
 
 import json
@@ -6,13 +6,13 @@ from typing import Any, Dict, List
 
 
 def parse_json_response(resp: str) -> Dict[str, Any]:
-    """解析可能包含 markdown 代码块的 JSON 响应
+    """Parse JSON response that may contain markdown code blocks
     
     Args:
-        resp: LLM 响应字符串，可能被 ```json 包裹
+        resp: LLM response string, possibly wrapped in ```json
         
     Returns:
-        解析后的 dict
+        Parsed dict
     """
     s = resp.strip()
     if s.startswith("```"):
@@ -26,27 +26,27 @@ def parse_json_response(resp: str) -> Dict[str, Any]:
 
 
 def indent_text(text: str, indent: str = "   ") -> str:
-    """给文本的每一行添加缩进
+    """Add indentation to each line of text
     
     Args:
-        text: 原始文本
-        indent: 缩进字符串
+        text: Original text
+        indent: Indentation string
         
     Returns:
-        缩进后的文本
+        Indented text
     """
     return "\n".join(indent + line for line in text.strip().split("\n"))
 
 
 def format_tools_description(tools: List[Any], verbose: bool = False) -> str:
-    """生成工具描述文本供 prompt 使用
+    """Generate tool description text for prompt usage
     
     Args:
-        tools: 工具列表，每个工具需要有 name, description, parameters 属性
-        verbose: 是否使用详细格式
+        tools: List of tools, each tool needs name, description, parameters attributes
+        verbose: Whether to use verbose format
         
     Returns:
-        格式化的工具描述字符串
+        Formatted tool description string
     """
     if not tools:
         return "No tools available."

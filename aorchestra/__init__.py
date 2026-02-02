@@ -1,17 +1,17 @@
 """
-aorchestra - 统一的 Orchestra 框架
+aorchestra - Unified Orchestra framework
 
-支持 GAIA、TerminalBench 和 SWE-bench 三种 benchmark。
+Supports GAIA, TerminalBench, and SWE-bench benchmarks.
 """
 from aorchestra.subagents import ReActAgent, SWEBenchSubAgent
-from aorchestra.sub_agent import OrchestraSubAgent  # 向后兼容
+from aorchestra.sub_agent import OrchestraSubAgent  # Backward compatibility
 from aorchestra.config import GAIAOrchestraConfig, TerminalBenchOrchestraConfig, SWEBenchOrchestraConfig
 
 __all__ = [
     # SubAgents
     "ReActAgent",
     "SWEBenchSubAgent",
-    "OrchestraSubAgent",  # 向后兼容别名
+    "OrchestraSubAgent",  # Backward compatibility alias
     # Configs
     "GAIAOrchestraConfig",
     "TerminalBenchOrchestraConfig",

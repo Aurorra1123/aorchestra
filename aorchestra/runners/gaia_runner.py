@@ -155,7 +155,7 @@ class GAIARunner:
                     main_llm = create_llm_instance(LLMsConfig.default().get(self.main_model))
                     runner = Runner()
                     
-                    # 创建模型别名映射
+                    # Create model alias mapping
                     model_to_alias = {
                         model: f"model_{i+1}" for i, model in enumerate(self.sub_models)
                     }
@@ -169,7 +169,7 @@ class GAIARunner:
                         alias_to_model=alias_to_model,
                     )
                     
-                    # GAIA 使用 complete action 而不是 submit
+                    # GAIA uses complete action instead of submit
                     from aorchestra.tools.complete import CompleteTool
                     complete_tool = CompleteTool()
                     
@@ -183,7 +183,7 @@ class GAIARunner:
                         mask_model_names=True,
                     )
 
-                    # 运行 MainAgent
+                    # Run MainAgent
                     from benchmark.common.env import BasicInfo
                     main_info = BasicInfo(
                         env_id=level_id,
@@ -222,16 +222,16 @@ class GAIARunner:
                     main_cost_after = main_agent.get_usage_cost()
                     main_cost = max(0.0, main_cost_after - main_cost_before)
 
-                    # 评分
+                    # Scoring
                     total_reward = 0.0
                     success = False
                     if final_answer:
                         logger.info(f"[GAIA] MainAgent complete with answer: {final_answer}")
                         
-                        # Step 1: 字符串匹配
+                        # Step 1: String matching
                         reward = question_scorer(str(final_answer), expected_answer)
                         
-                        # Step 2: LLM 语义匹配
+                        # Step 2: LLM semantic matching
                         if reward < 0.5:
                             logger.info(f"[GAIA] String match failed, trying LLM semantic scoring...")
                             try:
@@ -245,13 +245,13 @@ class GAIARunner:
                         total_reward = reward
                         success = reward > 0.5
 
-                    # 计算 sub_cost
+                    # Calculate sub_cost
                     sub_cost = sum(
                         float(a.get("result", {}).get("cost", 0.0) or 0.0)
                         for a in attempts_detail
                     )
                     total_cost = sub_cost + main_cost
-                    final_sub_model = None  # 可从 attempts_detail 提取
+                    final_sub_model = None  # Can be extracted from attempts_detail
 
                     end_time = datetime.now().isoformat()
 

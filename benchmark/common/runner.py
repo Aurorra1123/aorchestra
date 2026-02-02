@@ -31,8 +31,8 @@ class LevelResult:
     input_tokens: int = 0
     output_tokens: int = 0
     timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
-    start_time: Optional[str] = None  # 任务开始时间
-    end_time: Optional[str] = None    # 任务结束时间
+    start_time: Optional[str] = None  # Task start time
+    end_time: Optional[str] = None    # Task end time
 
 
 class Runner:
@@ -49,7 +49,7 @@ class Runner:
     
     async def run(self, agent: BaseAgent, env: Environment) -> LevelResult:
         """Run agent-environment interaction loop and return result."""
-        # 记录任务开始时间
+        # Record task start time
         start_time = datetime.now().isoformat()
         
         info = env.get_basic_info()
@@ -114,7 +114,7 @@ class Runner:
             if done:
                 break
 
-        # 记录任务结束时间
+        # Record task end time
         end_time = datetime.now().isoformat()
 
         usage_summary = agent.llm.get_usage_summary()

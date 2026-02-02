@@ -1,44 +1,44 @@
 # SWE-bench Benchmark Configuration (Orchestra Mode)
-# 用于 bench_aorchestra_swebench.py (MainAgent + SubAgent 模式)
+# For bench_aorchestra_swebench.py (MainAgent + SubAgent mode)
 
-# ======== 模型配置 ========
+# ======== Model Configuration ========
 main_model: "gemini-2.5-flash"
 sub_models:
   - "gemini-2.5-flash"
 
-# ======== 数据集配置 ========
-# 从 HuggingFace 自动加载
+# ======== Dataset Configuration ========
+# Auto-loaded from HuggingFace
 dataset_name: "princeton-nlp/SWE-bench_Verified"
 split: "test"
 
-# 确定性采样配置
+# Deterministic sampling configuration
 subset_seed: 42
 subset_sizes:
-  validate: 20    # 验证集大小
-  test: 100       # 测试集大小
+  validate: 20    # Validation set size
+  test: 100       # Test set size
 
-# 选择运行的子集
-# "all" = 按顺序跑 validate + test
-# "validate" = 只跑验证集
-# "test" = 只跑测试集
+# Select which subset to run
+# "all" = run validate + test in order
+# "validate" = run validation set only
+# "test" = run test set only
 subset_role: "validate"
 
-# ======== 任务限制 ========
+# ======== Task Limits ========
 max_steps: 50
 max_tasks: 10
 max_attempts: 10
 max_concurrency: 3
 
-# Docker 超时（秒）
+# Docker timeout (seconds)
 docker_timeout: 1800
 
-# ======== 输出配置 ========
+# ======== Output Configuration ========
 result_folder: "workspace/logs/swebench_aorchestra"
 
-# ======== 可选配置 ========
-# 指定运行特定的实例 ID
+# ======== Optional Configuration ========
+# Specify specific instance IDs to run
 # selected_ids_file: "benchmark/swebench/swebench_selected_ids.json"
 
-# 环境变量注入到 Docker 容器
+# Environment variable injection into Docker container
 # env_init:
 #   http_proxy: "http://127.0.0.1:7890"

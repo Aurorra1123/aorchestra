@@ -2,7 +2,7 @@
 
 Usage:
   python aorchestra/parallel/example_gaia_like_parallel_gold.py \
-    --question "请你帮我分析从2026年至今以来的黄金金价走势并且给出投资建议，帮助我规避重大事件和风险。"
+    --question "Analyze gold price trends since 2026 and provide investment advice, helping me avoid major events and risks."
 
 This script is benchmark-free:
 - Input: one research question
@@ -38,7 +38,7 @@ from aorchestra.prompts.gaia import GAIAMainAgentPrompt
 from aorchestra.tools.complete import CompleteTool
 from aorchestra.tools.delegate import DelegateTaskTool
 
-DEFAULT_QUESTION = "请你帮我分析从2026年至今以来的黄金金价走势并且给出投资建议，帮助我规避重大事件和风险。"
+DEFAULT_QUESTION = "Analyze gold price trends since 2026 and provide investment advice, helping me avoid major events and risks."
 
 
 class OpenResearchGaiaEnv(Environment):

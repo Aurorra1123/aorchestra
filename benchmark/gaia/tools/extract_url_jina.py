@@ -130,11 +130,11 @@ class ExtractUrlContentAction(BaseAction):
     
         query = f"Please read the source content and answer a following question:\n---begin of source content---\n{source_text}\n---end of source content---\n\nIf there is no relevant information, please clearly refuse to answer. Now answer the question based on the above content:\n{browse_query}"
     
-        # 处理长内容分块（仿照deep_research_utils.py的逻辑）
+        # Handle long content chunking (following deep_research_utils.py logic)
         encoding = tiktoken.get_encoding("cl100k_base")
         tokenized_source_text = encoding.encode(source_text)
 
-        if len(tokenized_source_text) > 95000:  # 使用与原代码相同的token限制
+        if len(tokenized_source_text) > 95000:  # Using same token limit as original code
             output = "Since the content is too long, the result is split and answered separately. Please combine the results to get the complete answer.\n"
             num_split = max(2, len(tokenized_source_text) // 95000 + 1)
             chunk_len = len(tokenized_source_text) // num_split

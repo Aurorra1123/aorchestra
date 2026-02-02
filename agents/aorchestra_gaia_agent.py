@@ -63,7 +63,7 @@ class OrchestraGAIAAgent(BaseAgent):
     context: str = Field(default="")
     completion_action: str = Field(default="finish")
     memory: Memory = Field(default=None)
-    allowed_tools: List[str] | None = Field(default=None)  # None = 全部可用
+    allowed_tools: List[str] | None = Field(default=None)  # None = all available
 
     def reset(self, env_info: "BasicInfo") -> None:
         if self.memory is None:
@@ -72,7 +72,7 @@ class OrchestraGAIAAgent(BaseAgent):
             self.memory.clear()
         self.current_env_instruction = env_info.instruction
         
-        # 如果指定了 allowed_tools，过滤 action_space
+        # If allowed_tools is specified, filter action_space
         if self.allowed_tools:
             self.current_action_space = self._filter_action_space(env_info.action_space, self.allowed_tools)
             logger.info(f"[OrchestraGAIAAgent] Filtered to tools: {self.allowed_tools}")
@@ -80,7 +80,7 @@ class OrchestraGAIAAgent(BaseAgent):
             self.current_action_space = env_info.action_space
 
     def _filter_action_space(self, action_space: str, allowed_tools: List[str]) -> str:
-        """简单过滤：在 action_space 末尾加上工具限制提示"""
+        """Simple filter: append tool restriction hint at the end of action_space"""
         return f"{action_space}\n\n[TOOL RESTRICTION] You can ONLY use: {allowed_tools}"
 
     def parse_action(self, resp: str) -> Dict[str, Any]:

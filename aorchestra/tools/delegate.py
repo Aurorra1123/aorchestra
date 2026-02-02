@@ -1,4 +1,4 @@
-"""DelegateTaskTool - 统一的任务委派工具"""
+"""DelegateTaskTool - Unified task delegation tool"""
 from __future__ import annotations
 
 from dataclasses import asdict, is_dataclass
@@ -33,7 +33,7 @@ def _make_serializable(obj: Any) -> Any:
 
 
 class DelegateTaskTool(BaseAction):
-    """统一的任务委派工具，支持 GAIA、TerminalBench 和 SWE-bench"""
+    """Unified task delegation tool supporting GAIA, TerminalBench, and SWE-bench"""
     
     name: str = "delegate_task"
     description: str = "Delegate task to SubAgent that executes commands"
@@ -48,16 +48,16 @@ class DelegateTaskTool(BaseAction):
         "required": ["task_instruction", "model"]
     })
     
-    # 核心依赖
+    # Core dependencies
     env: Any = Field(default=None, exclude=True)
     runner: Any = Field(default=None, exclude=True)
     models: list = Field(default_factory=list)
     
-    # 配置
+    # Configuration
     benchmark_type: str = Field(default="terminalbench")  # "gaia" | "terminalbench" | "swebench"
-    alias_to_model: Dict[str, str] = Field(default_factory=dict)  # 模型名遮蔽（可选）
+    alias_to_model: Dict[str, str] = Field(default_factory=dict)  # Model name masking (optional)
     
-    # 内部状态
+    # Internal state
     _trace_formatter: Any = None
     
     class Config:
@@ -79,7 +79,7 @@ class DelegateTaskTool(BaseAction):
         self.benchmark_type = benchmark_type
         self.alias_to_model = alias_to_model or {}
         
-        # 创建对应的 trace formatter
+        # Create corresponding trace formatter
         if benchmark_type == "gaia":
             self._trace_formatter = create_gaia_formatter()
         elif benchmark_type == "swebench":
@@ -87,7 +87,7 @@ class DelegateTaskTool(BaseAction):
         else:
             self._trace_formatter = create_terminalbench_formatter()
         
-        # 设置 model enum（使用别名或真实名）
+        # Set model enum (using alias or real name)
         display_models = list(self.alias_to_model.keys()) if self.alias_to_model else models
         self.parameters = {
             "type": "object",
@@ -111,32 +111,32 @@ class DelegateTaskTool(BaseAction):
         context: str = "", 
         tools: List[str] = None
     ) -> Dict:
-        """执行委派任务
+        """Execute delegated task
         
         Args:
-            task_instruction: SubAgent 要执行的任务描述
-            model: 使用的模型（可以是别名）
-            context: 额外的上下文信息
-            tools: 允许 SubAgent 使用的工具列表
+            task_instruction: Task description for SubAgent to execute
+            model: Model to use (can be an alias)
+            context: Additional context information
+            tools: List of tools allowed for SubAgent
             
         Returns:
-            包含执行结果的字典
+            Dictionary containing execution results
         """
-        # 1. 解析模型名（如果有别名映射）
+        # 1. Parse model name (if alias mapping exists)
         real_model = self.alias_to_model.get(model, model)
         if real_model not in self.models:
             return {"error": f"Invalid model: {model}", "steps_taken": 0, "done": False}
         
         logger.info(f"[DelegateTool] Creating SubAgent with model={real_model}, tools={tools}")
         
-        # 2. 获取原始问题
+        # 2. Get original question
         original_question = getattr(self.env, 'instruction', '') or ''
         
-        # 3. 创建 SubAgent（根据 benchmark_type 选择不同的 Agent）
+        # 3. Create SubAgent (select different Agent based on benchmark_type)
         llm = create_llm_instance(LLMsConfig.default().get(real_model))
         
         if self.benchmark_type == "swebench":
-            # SWE-bench 使用专门的 SWEBenchSubAgent（DISCUSSION + COMMAND 格式）
+            # SWE-bench uses dedicated SWEBenchSubAgent (DISCUSSION + COMMAND format)
             from aorchestra.subagents import SWEBenchSubAgent
             sub_agent = SWEBenchSubAgent(
                 llm=llm,
@@ -146,7 +146,7 @@ class DelegateTaskTool(BaseAction):
                 memory=Memory(llm=llm, max_memory=20),
             )
         else:
-            # GAIA 和 TerminalBench 使用 ReActAgent（JSON 格式）
+            # GAIA and TerminalBench use ReActAgent (JSON format)
             sub_agent = ReActAgent(
                 llm=llm,
                 benchmark_type=self.benchmark_type,
@@ -157,23 +157,23 @@ class DelegateTaskTool(BaseAction):
                 memory=Memory(llm=llm, max_memory=10),
             )
         
-        # 4. 临时替换 env.instruction
+        # 4. Temporarily replace env.instruction
         original_instruction = getattr(self.env, 'instruction', None)
         if hasattr(self.env, 'instruction'):
             self.env.instruction = task_instruction
         
         try:
-            # 5. 执行
+            # 5. Execute
             result = await self.runner.run(sub_agent, self.env)
             
-            # 6. 提取 finish_result
+            # 6. Extract finish_result
             finish_result = None
             if result.trace:
                 last = result.trace[-1]
                 if last.info.get("finished") and last.info.get("finish_result"):
                     finish_result = last.info["finish_result"]
             
-            # 7. 总结轨迹（固定使用 gemini-3-flash-preview）
+            # 7. Summarize trace (using fixed gemini-3-flash-preview model)
             trace_summary = await self._summarize_trace(result.trace, task_instruction)
             
             # Convert StepRecord objects to dicts for JSON serialization
@@ -200,18 +200,18 @@ class DelegateTaskTool(BaseAction):
             return {"error": str(e), "steps_taken": 0, "done": False, "cost": 0.0}
             
         finally:
-            # 8. 恢复 env.instruction
+            # 8. Restore env.instruction
             if original_instruction is not None and hasattr(self.env, 'instruction'):
                 self.env.instruction = original_instruction
     
     async def _summarize_trace(self, trace, task_instruction: str) -> str:
-        """总结执行轨迹（固定使用 gemini-3-flash-preview）"""
+        """Summarize execution trace (using fixed gemini-3-flash-preview model)"""
         if not trace:
             return "No steps executed"
         
         trace_text = self._trace_formatter.format_trace(trace)
         
-        # 根据 benchmark_type 选择不同的总结 prompt
+        # Select different summary prompt based on benchmark_type
         if self.benchmark_type == "gaia":
             prompt = f"""You are a trajectory summarizer. Review the SubAgent's execution trace.
 

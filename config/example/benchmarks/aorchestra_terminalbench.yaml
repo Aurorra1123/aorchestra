@@ -1,43 +1,43 @@
 # TerminalBench Benchmark Configuration (Orchestra Mode)
-# 用于 bench_aorchestra_terminalbench.py (MainAgent + SubAgent 模式)
+# For bench_aorchestra_terminalbench.py (MainAgent + SubAgent mode)
 
-# ======== 模型配置 ========
+# ======== Model Configuration ========
 main_model: "gemini-2.5-flash"
 sub_models:
   - "gemini-2.5-flash"
 
-# ======== 任务配置 ========
-# 任务目录（需要先下载 terminal-bench 数据集）
-# validate 目录用于验证，test 目录用于测试
+# ======== Task Configuration ========
+# Task directory (requires terminal-bench dataset to be downloaded first)
+# validate directory for validation, test directory for testing
 tasks_dir: "benchmark/terminalbench/terminal-bench/test"
 
-# ======== 任务限制 ========
+# ======== Task Limits ========
 max_steps: 50
 max_tasks: 10
 max_attempts: 10
 max_concurrency: 3
 
-# ======== 沙箱配置 ========
-# 沙箱类型: "docker" | "e2b" | "daytona"
+# ======== Sandbox Configuration ========
+# Sandbox type: "docker" | "e2b" | "daytona"
 sandbox: "docker"
 
-# Docker 超时（秒）
+# Docker timeout (seconds)
 docker_timeout: 600
 
-# E2B 配置（当 sandbox: "e2b" 时需要）
-# 需要设置环境变量 E2B_API_KEY 或在此处配置
+# E2B configuration (required when sandbox: "e2b")
+# Set environment variable E2B_API_KEY or configure here
 # e2b_api_key: ""
 
-# Daytona 配置（当 sandbox: "daytona" 时需要）
+# Daytona configuration (required when sandbox: "daytona")
 # daytona_api_key: ""
 # daytona_api_url: ""
 # daytona_target: ""
 
-# ======== 输出配置 ========
+# ======== Output Configuration ========
 result_folder: "workspace/logs/terminalbench_aorchestra"
 
-# ======== 环境变量注入 ========
-# 注入到沙箱容器的环境变量
+# ======== Environment Variable Injection ========
+# Environment variables to inject into sandbox container
 # env_init:
 #   http_proxy: "http://127.0.0.1:7890"
 #   https_proxy: "http://127.0.0.1:7890"

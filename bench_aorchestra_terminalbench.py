@@ -30,7 +30,7 @@ DEFAULT_CONFIG = ROOT / "config/benchmarks/aorchestra_terminalbench.yaml"
 
 
 def load_completed_tasks(csv_path: Path) -> set[str]:
-    """从 CSV 文件加载已完成的任务 ID。"""
+    """Load completed task IDs from CSV file."""
     if not csv_path.exists():
         return set()
     

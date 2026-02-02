@@ -21,7 +21,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from base.engine.logs import logger
-from benchmark.orchestra_bench_gaia import GAIAOrchestraBenchmark
+from benchmark.aorchestra_bench_gaia import GAIAOrchestraBenchmark
 from benchmark.gaia.tools import (
     GoogleSearchAction,
     ExecuteCodeAction,
@@ -74,7 +74,7 @@ async def main():
     ]
     logger.info(f"Loaded {len(gaia_tools)} GAIA tools: {[t.name for t in gaia_tools]}")
 
-    # Create benchmark (需要适配 GAIAOrchestraBenchmark 的接口)
+    # Create benchmark (need to adapt to GAIAOrchestraBenchmark interface)
     from benchmark.bench_gaia import GAIAConfig
     gaia_cfg = GAIAConfig(
         dataset_path=cfg.dataset_path,

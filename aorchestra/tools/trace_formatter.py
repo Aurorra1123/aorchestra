@@ -1,7 +1,7 @@
 """
-Trace Formatter - 抽象化的轨迹格式化器
+Trace Formatter - Abstracted trace formatting utility
 
-提供可扩展的轨迹格式化接口，支持不同 benchmark 环境的 action/observation 格式。
+Provides extensible trace formatting interface supporting different benchmark action/observation formats.
 """
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Protocol, Callable
 
 
 class StepLike(Protocol):
-    """Step 协议，兼容 StepRecord 结构"""
+    """Step protocol, compatible with StepRecord structure"""
     action: Dict[str, Any]
     observation: Any
     reward: float
@@ -19,35 +19,35 @@ class StepLike(Protocol):
 
 
 class ActionFormatter(ABC):
-    """Action 格式化器基类"""
+    """Action formatter base class"""
     
     @property
     @abstractmethod
     def action_type(self) -> str:
-        """返回此格式化器处理的 action 类型"""
+        """Return the action type this formatter handles"""
         ...
     
     @abstractmethod
     def format(self, params: Dict[str, Any], max_len: int = 100) -> str:
-        """格式化 action 为可读字符串"""
+        """Format action to readable string"""
         ...
 
 
 class ObservationFormatter(ABC):
-    """Observation 格式化器基类"""
+    """Observation formatter base class"""
     
     @abstractmethod
     def can_format(self, obs: Dict[str, Any]) -> bool:
-        """判断此格式化器是否可以处理该 observation"""
+        """Check if this formatter can handle the observation"""
         ...
     
     @abstractmethod
     def format(self, obs: Dict[str, Any], max_len: int = 300) -> tuple[str, str]:
         """
-        格式化 observation
+        Format observation
         
         Returns:
-            tuple[str, str]: (状态行, 输出内容)
+            tuple[str, str]: (status line, output content)
         """
         ...
 
@@ -55,7 +55,7 @@ class ObservationFormatter(ABC):
 # ============== TerminalBench Formatters ==============
 
 class ExecuteActionFormatter(ActionFormatter):
-    """TerminalBench execute action 格式化器"""
+    """TerminalBench execute action formatter"""
     
     @property
     def action_type(self) -> str:
@@ -67,7 +67,7 @@ class ExecuteActionFormatter(ActionFormatter):
 
 
 class FinishActionFormatter(ActionFormatter):
-    """finish action 格式化器（通用）"""
+    """finish action formatter (generic)"""
     
     @property
     def action_type(self) -> str:
@@ -80,7 +80,7 @@ class FinishActionFormatter(ActionFormatter):
 
 
 class SubmitActionFormatter(ActionFormatter):
-    """submit action 格式化器（通用）"""
+    """submit action formatter (generic)"""
     
     @property
     def action_type(self) -> str:
@@ -91,7 +91,7 @@ class SubmitActionFormatter(ActionFormatter):
 
 
 class ExitCodeObservationFormatter(ObservationFormatter):
-    """TerminalBench observation 格式化器（exit_code + output）"""
+    """TerminalBench observation formatter (exit_code + output)"""
     
     def can_format(self, obs: Dict[str, Any]) -> bool:
         return "exit_code" in obs
@@ -105,7 +105,7 @@ class ExitCodeObservationFormatter(ObservationFormatter):
 # ============== GAIA Formatters ==============
 
 class GoogleSearchActionFormatter(ActionFormatter):
-    """GAIA GoogleSearchAction 格式化器"""
+    """GAIA GoogleSearchAction formatter"""
     
     @property
     def action_type(self) -> str:
@@ -117,7 +117,7 @@ class GoogleSearchActionFormatter(ActionFormatter):
 
 
 class ExtractUrlActionFormatter(ActionFormatter):
-    """GAIA ExtractUrlContentAction 格式化器"""
+    """GAIA ExtractUrlContentAction formatter"""
     
     @property
     def action_type(self) -> str:
@@ -130,7 +130,7 @@ class ExtractUrlActionFormatter(ActionFormatter):
 
 
 class ExecuteCodeActionFormatter(ActionFormatter):
-    """GAIA ExecuteCodeAction 格式化器"""
+    """GAIA ExecuteCodeAction formatter"""
     
     @property
     def action_type(self) -> str:
@@ -142,7 +142,7 @@ class ExecuteCodeActionFormatter(ActionFormatter):
 
 
 class SuccessObservationFormatter(ObservationFormatter):
-    """GAIA observation 格式化器（success + output/error）"""
+    """GAIA observation formatter (success + output/error)"""
     
     def can_format(self, obs: Dict[str, Any]) -> bool:
         return "success" in obs
@@ -156,7 +156,7 @@ class SuccessObservationFormatter(ObservationFormatter):
 # ============== SWE-bench Formatters ==============
 
 class ACICommandActionFormatter(ActionFormatter):
-    """SWE-bench aci_command action 格式化器"""
+    """SWE-bench aci_command action formatter"""
     
     @property
     def action_type(self) -> str:
@@ -164,7 +164,7 @@ class ACICommandActionFormatter(ActionFormatter):
     
     def format(self, params: Dict[str, Any], max_len: int = 100) -> str:
         cmd = params.get("command", "")
-        # 截断长命令（如 str_replace, edit 等多行命令）
+        # Truncate long commands (e.g., str_replace, edit with multi-line content)
         if "\n" in cmd:
             first_line = cmd.split("\n")[0][:60]
             return f'aci_command("{first_line}...")'
@@ -172,7 +172,7 @@ class ACICommandActionFormatter(ActionFormatter):
 
 
 class SWEBenchObservationFormatter(ObservationFormatter):
-    """SWE-bench observation 格式化器（state_info + output）"""
+    """SWE-bench observation formatter (state_info + output)"""
     
     def can_format(self, obs: Dict[str, Any]) -> bool:
         return "state_info" in obs or "command" in obs
@@ -187,7 +187,7 @@ class SWEBenchObservationFormatter(ObservationFormatter):
 # ============== Fallback Formatters ==============
 
 class FallbackActionFormatter(ActionFormatter):
-    """通用 fallback action 格式化器"""
+    """Generic fallback action formatter"""
     
     def __init__(self, action_type: str = "unknown"):
         self._action_type = action_type
@@ -202,22 +202,22 @@ class FallbackActionFormatter(ActionFormatter):
 
 
 class FallbackObservationFormatter(ObservationFormatter):
-    """通用 fallback observation 格式化器"""
+    """Generic fallback observation formatter"""
     
     def can_format(self, obs: Dict[str, Any]) -> bool:
-        return True  # 总是可以处理
+        return True  # Always handles
     
     def format(self, obs: Dict[str, Any], max_len: int = 300) -> tuple[str, str]:
         return "", str(obs)
 
 
-# ============== TraceFormatter 主类 ==============
+# ============== TraceFormatter Main Class ==============
 
 class TraceFormatter:
     """
-    轨迹格式化器
+    Trace formatter
     
-    通过注册 ActionFormatter 和 ObservationFormatter 实现可扩展的格式化逻辑。
+    Implements extensible formatting logic via registered ActionFormatter and ObservationFormatter.
     """
     
     def __init__(self):
@@ -226,17 +226,17 @@ class TraceFormatter:
         self._fallback_obs_formatter = FallbackObservationFormatter()
     
     def register_action_formatter(self, formatter: ActionFormatter) -> "TraceFormatter":
-        """注册 action 格式化器"""
+        """Register action formatter"""
         self._action_formatters[formatter.action_type] = formatter
         return self
     
     def register_obs_formatter(self, formatter: ObservationFormatter) -> "TraceFormatter":
-        """注册 observation 格式化器"""
+        """Register observation formatter"""
         self._obs_formatters.append(formatter)
         return self
     
     def format_action(self, action: Dict[str, Any], max_len: int = 100) -> str:
-        """格式化单个 action"""
+        """Format single action"""
         action_type = action.get("action", "unknown")
         params = action.get("params", {})
         
@@ -246,7 +246,7 @@ class TraceFormatter:
         return FallbackActionFormatter(action_type).format(params, max_len)
     
     def format_observation(self, obs: Any, max_len: int = 300) -> tuple[str, str]:
-        """格式化单个 observation"""
+        """Format single observation"""
         if not isinstance(obs, dict):
             return "", str(obs)
         
@@ -258,30 +258,30 @@ class TraceFormatter:
     
     def format_trace(self, trace: List[StepLike], max_output_len: int = 300) -> str:
         """
-        格式化完整轨迹
+        Format complete trace
         
         Args:
-            trace: 步骤列表
-            max_output_len: 输出截断长度
+            trace: List of steps
+            max_output_len: Output truncation length
         
         Returns:
-            str: 格式化后的轨迹文本
+            str: Formatted trace text
         """
         if not trace:
             return "No steps executed"
         
         lines = []
         for i, step in enumerate(trace, 1):
-            # 格式化 action
+            # Format action
             action_str = self.format_action(step.action)
             lines.append(f"Step {i}: {action_str}")
             
-            # 格式化 observation
+            # Format observation
             status_line, output = self.format_observation(step.observation, max_output_len)
             if status_line:
                 lines.append(f"  → {status_line}")
             
-            # 截断 output
+            # Truncate output
             if len(output) > max_output_len:
                 output = output[:max_output_len] + f"...[+{len(output)-max_output_len} chars]"
             output = output.replace("\n", " ").strip()
@@ -291,10 +291,10 @@ class TraceFormatter:
         return "\n".join(lines)
 
 
-# ============== 预置格式化器工厂 ==============
+# ============== Pre-built Formatter Factories ==============
 
 def create_terminalbench_formatter() -> TraceFormatter:
-    """创建 TerminalBench 格式化器"""
+    """Create TerminalBench formatter"""
     return (
         TraceFormatter()
         .register_action_formatter(ExecuteActionFormatter())
@@ -305,7 +305,7 @@ def create_terminalbench_formatter() -> TraceFormatter:
 
 
 def create_gaia_formatter() -> TraceFormatter:
-    """创建 GAIA 格式化器"""
+    """Create GAIA formatter"""
     return (
         TraceFormatter()
         .register_action_formatter(GoogleSearchActionFormatter())
@@ -318,7 +318,7 @@ def create_gaia_formatter() -> TraceFormatter:
 
 
 def create_swebench_formatter() -> TraceFormatter:
-    """创建 SWE-bench 格式化器"""
+    """Create SWE-bench formatter"""
     return (
         TraceFormatter()
         .register_action_formatter(ACICommandActionFormatter())
@@ -331,7 +331,7 @@ def create_swebench_formatter() -> TraceFormatter:
 
 
 def create_universal_formatter() -> TraceFormatter:
-    """创建通用格式化器（支持所有已知格式）"""
+    """Create universal formatter (supports all known formats)"""
     return (
         TraceFormatter()
         # TerminalBench actions

@@ -10,35 +10,35 @@ import yaml
 
 @dataclass
 class GAIAOrchestraConfig:
-    """GAIA Orchestra 配置"""
+    """GAIA Orchestra configuration"""
     
-    # 模型
+    # Model
     main_model: str
     sub_models: List[str]
     
-    # GAIA 数据集
+    # GAIA dataset
     dataset_path: Path
     attachments_dir: Path
     level_filter: List[int] | None = None
     max_tasks: int | None = None
     
-    # 执行
+    # Execution
     max_attempts: int = 5
     max_concurrency: int = 1
     
-    # 输出
+    # Output
     result_folder: Path = field(default_factory=lambda: Path("workspace/logs"))
     trajectory_folder: Path = field(default_factory=lambda: Path("workspace/logs/trajectories"))
     timestamp: str | None = None
     
     @classmethod
     def load(cls, config_path: Path | str) -> "GAIAOrchestraConfig":
-        """从 YAML 文件加载配置"""
+        """Load configuration from YAML file"""
         config_path = Path(config_path)
         with config_path.open("r", encoding="utf-8") as f:
             raw = yaml.safe_load(f) or {}
         
-        # 必填字段
+        # Required fields
         main_model = raw.get("main_model")
         if not main_model:
             raise ValueError("main_model is required")
@@ -57,7 +57,7 @@ class GAIAOrchestraConfig:
             raise ValueError("attachments_dir is required")
         attachments_dir = cls._resolve_path(attachments_dir, config_path)
         
-        # 可选字段
+        # Optional fields
         level_filter = raw.get("level_filter")
         max_tasks = raw.get("max_tasks")
         max_attempts = int(raw.get("max_attempts", 5))
@@ -87,39 +87,39 @@ class GAIAOrchestraConfig:
     
     @staticmethod
     def _resolve_path(path_str: str, config_path: Path) -> Path:
-        """解析路径（相对于配置文件或项目根目录）"""
+        """Resolve path (relative to config file or project root)"""
         path = Path(path_str)
         if path.is_absolute():
             return path
-        # 尝试相对于配置文件
+        # Try relative to config file
         rel_to_config = config_path.parent / path
         if rel_to_config.exists():
             return rel_to_config.resolve()
-        # 尝试相对于项目根目录
+        # Try relative to project root
         PROJECT_ROOT = Path(__file__).parent.parent
         return (PROJECT_ROOT / path).resolve()
 
 
 @dataclass
 class TerminalBenchOrchestraConfig:
-    """TerminalBench Orchestra 配置"""
+    """TerminalBench Orchestra configuration"""
     
-    # 模型
+    # Model
     main_model: str
     sub_models: List[str]
     
-    # 任务
+    # Tasks
     tasks_dir: Path
     max_tasks: int | None = None
     
-    # 执行
+    # Execution
     max_steps: int = 30
     max_attempts: int = 10
     max_concurrency: int = 1
     sandbox: str = "docker"  # docker | e2b | daytona
     docker_timeout: int = 600
     
-    # 输出
+    # Output
     result_folder: Path = field(default_factory=lambda: Path("workspace/logs"))
     trajectory_dir: Path | None = None
     csv_summary_path: Path | None = None
@@ -136,12 +136,12 @@ class TerminalBenchOrchestraConfig:
     
     @classmethod
     def load(cls, config_path: Path | str) -> "TerminalBenchOrchestraConfig":
-        """从 YAML 文件加载配置"""
+        """Load configuration from YAML file"""
         config_path = Path(config_path)
         with config_path.open("r", encoding="utf-8") as f:
             raw = yaml.safe_load(f) or {}
         
-        # 必填字段
+        # Required fields
         main_model = raw.get("main_model")
         if not main_model:
             raise ValueError("main_model is required")
@@ -155,7 +155,7 @@ class TerminalBenchOrchestraConfig:
             raise ValueError("tasks_dir is required")
         tasks_dir = cls._resolve_path(tasks_dir, config_path)
         
-        # 可选字段
+        # Optional fields
         max_tasks = raw.get("max_tasks")
         max_steps = int(raw.get("max_steps", 30))
         max_attempts = int(raw.get("max_attempts", 10))
@@ -198,69 +198,69 @@ class TerminalBenchOrchestraConfig:
     
     @staticmethod
     def _resolve_path(path_str: str, config_path: Path) -> Path:
-        """解析路径（相对于配置文件或项目根目录）"""
+        """Resolve path (relative to config file or project root)"""
         path = Path(path_str)
         if path.is_absolute():
             return path
-        # 尝试相对于配置文件
+        # Try relative to config file
         rel_to_config = config_path.parent / path
         if rel_to_config.exists():
             return rel_to_config.resolve()
-        # 尝试相对于项目根目录
+        # Try relative to project root
         PROJECT_ROOT = Path(__file__).parent.parent
         return (PROJECT_ROOT / path).resolve()
 
 
 @dataclass
 class SWEBenchOrchestraConfig:
-    """SWE-bench Orchestra 配置"""
+    """SWE-bench Orchestra configuration"""
     
-    # 模型
+    # Model
     main_model: str
     sub_models: List[str]
     
-    # SWE-bench 数据集设置
+    # SWE-bench dataset settings
     dataset_name: str = "princeton-nlp/SWE-bench_Verified"
     split: str = "test"
     subset_seed: Optional[int] = None
     subset_sizes: Optional[Dict[str, int]] = None
     subset_role: Optional[str] = None
     
-    # 指定 instance ID 文件（JSON 数组）
+    # Instance ID file (JSON array)
     selected_ids_file: Optional[Path] = None
     
-    # 任务设置
+    # Task settings
     max_tasks: Optional[int] = None
-    max_steps: int = 50  # SubAgent 最大步数
-    max_attempts: int = 10  # MainAgent 最大尝试次数
+    max_steps: int = 50  # SubAgent max steps
+    max_attempts: int = 10  # MainAgent max attempts
     
-    # 执行
+    # Execution
     max_concurrency: int = 1
     docker_timeout: int = 1800
     
-    # 输出
+    # Output
     result_folder: Path = field(default_factory=lambda: Path("workspace/logs"))
     trajectory_dir: Optional[Path] = None
     csv_summary_path: Optional[Path] = None
     timestamp: Optional[str] = None
     
-    # 环境初始化
+    # Environment initialization
     env_init: Optional[Dict[str, str]] = None
     
-    # HuggingFace 缓存目录
+    # HuggingFace cache directory
     cache_dir: Optional[str] = None
     
-    # ACI 文件查看窗口大小
+    # ACI file view window size
     window_size: int = 100
     
     @classmethod
     def load(cls, config_path: Path | str) -> "SWEBenchOrchestraConfig":
-        """从 YAML 文件加载配置"""
+        """Load configuration from YAML file"""
         config_path = Path(config_path)
         with config_path.open("r", encoding="utf-8") as f:
             raw = yaml.safe_load(f) or {}
         
-        # 必填字段
+        # Required fields
         main_model = raw.get("main_model")
         if not main_model:
             raise ValueError("main_model is required")
@@ -269,7 +269,7 @@ class SWEBenchOrchestraConfig:
         if not sub_models or not isinstance(sub_models, list):
             raise ValueError("sub_models must be a non-empty list")
         
-        # SWE-bench 数据集设置
+        # SWE-bench dataset settings
         dataset_name = raw.get("dataset_name", "princeton-nlp/SWE-bench_Verified")
         split = raw.get("split", "test")
         
@@ -287,7 +287,7 @@ class SWEBenchOrchestraConfig:
         
         subset_role = raw.get("subset_role")
         
-        # 可选路径
+        # Optional paths
         result_folder = cls._resolve_path(
             raw.get("result_folder", "workspace/logs"),
             config_path
@@ -329,14 +329,14 @@ class SWEBenchOrchestraConfig:
     
     @staticmethod
     def _resolve_path(path_str: str, config_path: Path) -> Path:
-        """解析路径（相对于配置文件或项目根目录）"""
+        """Resolve path (relative to config file or project root)"""
         path = Path(path_str)
         if path.is_absolute():
             return path
-        # 尝试相对于配置文件
+        # Try relative to config file
         rel_to_config = config_path.parent / path
         if rel_to_config.exists():
             return rel_to_config.resolve()
-        # 尝试相对于项目根目录
+        # Try relative to project root
         PROJECT_ROOT = Path(__file__).parent.parent
         return (PROJECT_ROOT / path).resolve()

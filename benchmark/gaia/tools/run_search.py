@@ -29,27 +29,27 @@ async def serper_search(
     base_url: str,
     max_results: int = 8,
 ) -> Dict[str, Any]:
-    # 🔁 对齐 patch 后 SerperWrapper.get_headers 的逻辑
+    # Align with patched SerperWrapper.get_headers logic
     headers = {
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",
     }
 
-    # 🔁 对齐 patch 后 SerperWrapper.get_payloads 的逻辑
+    # Align with patched SerperWrapper.get_payloads logic
     payload = {
         "q": query,
         "num": max_results,
-        # 如果你在 SerperWrapper 里有 self.payload 里默认字段（比如 type: "search"）
-        # 可以在这里手动加上：
+        # If you have default fields in SerperWrapper self.payload (e.g., type: "search")
+        # You can manually add them here:
         # "type": "search",
     }
 
     timeout = aiohttp.ClientTimeout(total=30)
     async with aiohttp.ClientSession(timeout=timeout, trust_env=True) as session:
-        # patch 后 SerperWrapper 用的是 data=JSON_STRING，这里两种都可以：
+        # Patched SerperWrapper uses data=JSON_STRING, both approaches work:
         # 1) data=json.dumps(payload)
         # 2) json=payload
-        # 为了和 SerperWrapper 尽量一致，这里用 data=...
+        # To align with SerperWrapper as much as possible, using data=...
         async with session.post(
             base_url,
             data=json.dumps(payload),

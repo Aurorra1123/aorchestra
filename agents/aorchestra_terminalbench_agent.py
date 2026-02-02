@@ -111,7 +111,7 @@ class ReAcTAgent(BaseAgent):
     async def step(self, observation: Observation, history: Any, current_step: int = 1, max_steps: int = 30) -> tuple[Action, str]:
         remaining_steps = max_steps - current_step
         
-        # 动态生成 budget warning
+        # Dynamically generate budget warning
         if remaining_steps <= 3:
             budget_warning = f"🚨 CRITICAL: Only {remaining_steps} steps left! Use 'finish' NOW to report your progress!"
         elif remaining_steps <= 5:
@@ -119,7 +119,7 @@ class ReAcTAgent(BaseAgent):
         else:
             budget_warning = ""
         
-        # 获取 SubAgent 的字段（如果存在），否则使用默认值
+        # Get SubAgent fields (if exist), otherwise use default values
         task_instruction = getattr(self, 'task_instruction', '') or self.current_env_instruction
         context = getattr(self, 'context', '') or "No additional context provided."
         original_question = getattr(self, 'original_question', '') or self.current_env_instruction

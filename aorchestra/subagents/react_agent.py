@@ -1,4 +1,4 @@
-"""ReActAgent - ReAct 模式的 SubAgent 实现"""
+"""ReActAgent - ReAct-style SubAgent implementation"""
 from __future__ import annotations
 
 import re
@@ -13,7 +13,7 @@ from base.engine.logs import logger, LogLevel
 from benchmark.common.env import BasicInfo, Observation, Action
 
 
-# GAIA SubAgent Prompt 模板
+# GAIA SubAgent Prompt Template
 GAIA_PROMPT = """You are a specialized SubAgent. Complete the assigned task efficiently.
 
 ==== Progress ====
@@ -58,7 +58,7 @@ GAIA_PROMPT = """You are a specialized SubAgent. Complete the assigned task effi
 """
 
 
-# TerminalBench SubAgent Prompt 模板
+# TerminalBench SubAgent Prompt Template
 TERMINALBENCH_PROMPT = """
 ==== Progress ====
 [Step {current_step}/{max_steps}] Remaining: {remaining_steps} step(s)
@@ -121,19 +121,19 @@ For finish:
 
 
 class ReActAgent(BaseAgent):
-    """ReAct 模式的 SubAgent，支持 GAIA 和 TerminalBench"""
+    """ReAct-style SubAgent supporting GAIA and TerminalBench"""
     
     name: str = Field(default="ReActAgent")
     description: str = Field(default="ReAct-style SubAgent for Orchestra framework")
     
-    # 核心字段
+    # Core fields
     benchmark_type: str = Field(default="terminalbench")  # "gaia" | "terminalbench"
-    task_instruction: str = Field(default="")             # MainAgent 分配的子任务
-    context: str = Field(default="")                      # 上下文/hints
-    original_question: str = Field(default="")            # 原始完整问题
-    allowed_tools: List[str] | None = Field(default=None) # 工具限制
+    task_instruction: str = Field(default="")             # Subtask assigned by MainAgent
+    context: str = Field(default="")                      # Context/hints
+    original_question: str = Field(default="")            # Original complete question
+    allowed_tools: List[str] | None = Field(default=None) # Tool restrictions
     
-    # 内部状态
+    # Internal state
     current_env_instruction: str = Field(default="")
     current_action_space: str = Field(default="")
     memory: Memory = Field(default=None)
@@ -142,19 +142,19 @@ class ReActAgent(BaseAgent):
         arbitrary_types_allowed = True
     
     def reset(self, env_info: BasicInfo) -> None:
-        """初始化 Agent"""
+        """Initialize Agent"""
         if self.memory is None:
             self.memory = Memory(llm=self.llm, max_memory=10)
         else:
             self.memory.clear()
         
-        # 保存原始问题
+        # Save original question
         if not self.original_question:
             self.original_question = env_info.instruction
         
         self.current_env_instruction = env_info.instruction
         
-        # 工具过滤（如果指定了 allowed_tools）
+        # Tool filtering (if allowed_tools specified)
         if self.allowed_tools:
             self.current_action_space = self._filter_action_space(
                 env_info.action_space, 
@@ -165,14 +165,14 @@ class ReActAgent(BaseAgent):
             self.current_action_space = env_info.action_space
     
     def _normalize_tool_name(self, name: str) -> str:
-        """标准化工具名称，用于模糊匹配"""
+        """Normalize tool name for fuzzy matching"""
         normalized = name.lower().replace("_", "")
         if normalized.endswith("action"):
             normalized = normalized[:-6]
         return normalized
     
     def _tool_matches(self, tool_name: str, allowed_tools: List[str]) -> bool:
-        """检查工具名是否匹配（支持模糊匹配）"""
+        """Check if tool name matches (supports fuzzy matching)"""
         if tool_name in allowed_tools:
             return True
         
@@ -184,7 +184,7 @@ class ReActAgent(BaseAgent):
         return False
     
     def _filter_action_space(self, action_space: str, allowed_tools: List[str]) -> str:
-        """过滤 action_space，只保留允许的工具描述"""
+        """Filter action_space, keeping only allowed tool descriptions"""
         blocks = re.split(r'\n(?=### )', action_space)
         
         filtered_blocks = []
@@ -202,15 +202,15 @@ class ReActAgent(BaseAgent):
         return "\n\n".join(filtered_blocks)
     
     def parse_action(self, resp: str) -> Dict[str, Any]:
-        """解析 LLM 响应为 action"""
+        """Parse LLM response to action"""
         return parse_llm_action_response(resp)
     
     def _get_memory(self) -> str:
-        """获取 memory 文本"""
+        """Get memory text"""
         return self.memory.as_text()
     
     def _get_budget_warning(self, remaining_steps: int) -> str:
-        """生成预算警告"""
+        """Generate budget warning"""
         if remaining_steps <= 3:
             return f"🚨 CRITICAL: Only {remaining_steps} steps left! Use 'finish' NOW!"
         elif remaining_steps <= 5:
@@ -225,7 +225,7 @@ class ReActAgent(BaseAgent):
         remaining_steps: int,
         budget_warning: str,
     ) -> str:
-        """根据 benchmark_type 构建 prompt"""
+        """Build prompt based on benchmark_type"""
         if self.benchmark_type == "gaia":
             return GAIA_PROMPT.format(
                 task_instruction=self.task_instruction,
@@ -260,7 +260,7 @@ class ReActAgent(BaseAgent):
         current_step: int = 1, 
         max_steps: int = 30
     ) -> tuple[Action, str, str]:
-        """执行一步
+        """Execute one step
         
         Returns:
             tuple: (action, raw_response, raw_input_prompt)
@@ -268,7 +268,7 @@ class ReActAgent(BaseAgent):
         remaining_steps = max_steps - current_step
         budget_warning = self._get_budget_warning(remaining_steps)
         
-        # 构建 prompt
+        # Build prompt
         prompt = self._build_prompt(
             observation=observation,
             current_step=current_step,
@@ -285,14 +285,14 @@ class ReActAgent(BaseAgent):
             logger.error(f"LLM call failed: {e}")
             resp = ""
         
-        # 解析响应
+        # Parse response
         memory_content = parse_llm_output(resp, "memory")
         thinking = memory_content.get("memory") if isinstance(memory_content, dict) else None
         action = self.parse_action(resp)
         
         logger.agent_action(f"ReActAgent Action: {action}")
         
-        # 更新 memory
+        # Update memory
         agent_obs = history[-1].info.get("last_action_result") if history else None
         await self.memory.add_memory(obs=agent_obs, action=action, thinking=thinking, raw_response=resp)
         

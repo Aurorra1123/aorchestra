@@ -6,7 +6,7 @@ import json
 
 from base.agent.base_action import BaseAction
 
-# Serper API 配置 (官方 API)
+# Serper API configuration (official API)
 SERPER_API_KEY = os.getenv("SERPER_API_KEY", "")
 SERPER_BASE_URL = "https://google.serper.dev/search"
 
@@ -27,7 +27,7 @@ class GoogleSearchAction(BaseAction):
     }
 
     async def __call__(self, **kwargs) -> Any:
-        # 直接使用新的代理 API，不从环境变量读取（避免被旧的 Key 覆盖）
+        # Directly use the new proxy API, don't read from env vars (avoid being overwritten by old key)
         api_key = SERPER_API_KEY
         base_url = SERPER_BASE_URL
 
@@ -42,7 +42,7 @@ class GoogleSearchAction(BaseAction):
             return {"success": False, "output": None, "error": "aiohttp not available", "metrics": {}}
 
         async def _fetch() -> Dict[str, Any]:
-            # 官方 Serper API 使用 X-API-KEY 认证
+            # Official Serper API uses X-API-KEY authentication
             headers = {
                 "X-API-KEY": api_key,
                 "Content-Type": "application/json",
