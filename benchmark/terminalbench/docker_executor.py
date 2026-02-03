@@ -282,10 +282,6 @@ class DockerExecutor(BaseExecutor):
         except Exception as e:
             return f"Error executing command: {e}", -1
     
-    def get_container_id(self) -> Optional[str]:
-        """Get the container ID."""
-        return self.container_id
-
     async def run_tests(self) -> float:
         """Run tests and return reward."""
         if not self.container_id:

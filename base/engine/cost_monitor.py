@@ -13,10 +13,6 @@ import json
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from base.engine.cost_monitor import CostMonitor
 
 _current_monitor: contextvars.ContextVar["CostMonitor | None"] = contextvars.ContextVar(
     "cost_monitor", default=None
@@ -112,4 +108,3 @@ def record_cost(model: str, input_tokens: int, output_tokens: int, cost: float) 
     monitor = get_current_monitor()
     if monitor is not None:
         monitor.record(model, input_tokens, output_tokens, cost)
-
