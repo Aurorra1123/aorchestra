@@ -88,6 +88,11 @@ extracted_files/
 *.pgm
 *.ppm
 
+# 允许仓库内 figure 资源跟踪
+!figure/
+!figure/*.png
+!figure/*.pdf
+
 # ========== 其他 ==========
 arxiv_lat.html
 /benchmark/interactcomp/docs
