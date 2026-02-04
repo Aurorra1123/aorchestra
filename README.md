@@ -1,17 +1,26 @@
-# AOrchestra
+# AOrchestra: Automating Sub-Agent Creation for Agentic Orchestration
 
-MainAgent + SubAgent orchestration framework for **GAIA**, **SWE-bench**, and **TerminalBench**.
+[![Arxiv](https://img.shields.io/badge/2602.03786-arXiv-red)](https://arxiv.org/abs/2602.03786)
 
-> Note: legacy single-agent entry points were removed. Use the AOrchestra runners below.
+> If you encounter any difficulties in using or reproducing the code, please contact me at [aurorra1123@gmail.com](mailto:aurorra1123@gmail.com).
+
+
+We introduce our AOrchestra. Across three challenging benchmarks (GAIA, SWE-Bench, Terminal-Bench), AOrchestra achieves a 16.28% relative improvement over the strongest baseline when paired with Gemini-3-Flash.
+
+![Introduction](figure/abs.png)
+
+
+Prior sub-agent designs in long-horizon agentic systems typically fall into two gaps. One treats sub-agents as context-isolated threads or copied agents, which can reduce context rot but offers limited specialization because the sub-agent’s capabilities are largely fixed. The other relies on static, predefined roles (e.g., coder/searcher/writer), which provides specialization but is inflexible and requires substantial human engineering to maintain across tasks and environments. In contrast, AOrchestra views a sub-agent as a configurable unit specified by a four-tuple $\phi=\langle I,C,T,M\rangle$. 
+
+
+[![Diff](figure/diff.png)](figure/diff.pdf)
 
 ## Core Idea
 
-AOrchestra separates orchestration and execution:
+![Introduction](figure/introduction.png)
 
-- **MainAgent**: plans, decomposes, and coordinates subtasks.
-- **SubAgent**: executes concrete actions inside each benchmark environment.
+Our core claim is that agent orchestration becomes modular, controllable, and plug-and-play when we model any (sub-)agent as a four-tuple interface $\langle I,C,T,M\rangle$ and let a central orchestrator concretize this interface at runtime. This abstraction decouples orchestration from execution: the orchestrator focuses on goal decomposition and tuple synthesis—writing actionable instructions $I$, curating context $C$, selecting tools $T$, and choosing models $M$—while dynamically created sub-agents focus on executing delegated subtasks. As a result, the system can specialize sub-agents per subtask, explicitly control context sharing to mitigate long-horizon degradation, and navigate performance–cost trade-offs through configurable choices of $C$, $T$, and $M$, without relying on static roles or full-context copying.
 
-This design makes multi-step tasks easier to solve while keeping benchmark-specific tooling modular.
 
 ## Repository Layout
 
@@ -103,9 +112,7 @@ Benchmark-specific options:
 - SWE-bench: `--skip-completed`
 - TerminalBench: `--skip_completed`
 
-## Paper
 
-- arXiv: https://arxiv.org/abs/2602.03786
 
 ## Citation
 
