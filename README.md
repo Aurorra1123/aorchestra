@@ -7,8 +7,10 @@
 
 We introduce our AOrchestra. Across three challenging benchmarks (GAIA, SWE-Bench, Terminal-Bench), AOrchestra achieves a 16.28% relative improvement over the strongest baseline when paired with Gemini-3-Flash.
 
-![Introduction](figure/abs.png)
 
+<p align="center">
+  <img src="figure/abs.png"" width="75%">
+</p>
 
 Prior sub-agent designs in long-horizon agentic systems typically fall into two gaps. One treats sub-agents as context-isolated threads or copied agents, which can reduce context rot but offers limited specialization because the sub-agent’s capabilities are largely fixed. The other relies on static, predefined roles (e.g., coder/searcher/writer), which provides specialization but is inflexible and requires substantial human engineering to maintain across tasks and environments. In contrast, AOrchestra views a sub-agent as a configurable unit specified by a four-tuple $\phi=\langle I,C,T,M\rangle$. 
 
