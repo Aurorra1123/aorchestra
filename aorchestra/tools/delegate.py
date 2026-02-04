@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import asdict, is_dataclass
 from typing import Any, Dict, List
 
-from pydantic import Field
+from pydantic import Field, PrivateAttr
 
 from base.agent.base_action import BaseAction
 from base.agent.memory import Memory
@@ -58,11 +58,10 @@ class DelegateTaskTool(BaseAction):
     alias_to_model: Dict[str, str] = Field(default_factory=dict)  # Model name masking (optional)
     
     # Internal state
-    _trace_formatter: Any = None
+    _trace_formatter: Any = PrivateAttr(default=None)
     
     class Config:
         arbitrary_types_allowed = True
-        underscore_attrs_are_private = True
     
     def __init__(
         self,

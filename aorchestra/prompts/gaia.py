@@ -6,54 +6,45 @@ GAIA tasks are question-answering tasks that require:
 - Code execution for computation
 - Final answer extraction
 """
+import json
 from typing import Any, Dict, List
 
-from base.engine.async_llm import ModelPricing
+from aorchestra.main_agent import build_model_pricing_table
+
+
+def format_tools_description(tools: List[Any]) -> str:
+    """Format tools list into description string."""
+    if not tools:
+        return "No tools available."
+    
+    descriptions = []
+    for tool in tools:
+        desc = f"Tool Name: {tool.name}\nDescription: {tool.description}"
+        if tool.parameters:
+            desc += f"\nParameters: {json.dumps(tool.parameters, indent=2)}"
+        descriptions.append(desc)
+    
+    return "\n\n".join(descriptions)
 
 
 class GAIAMainAgentPrompt:
     """Generate prompts for GAIA benchmark tasks."""
     
     @staticmethod
-    def _build_model_pricing_table(
-        sub_models: List[str], 
-        model_to_alias: Dict[str, str] = None
-    ) -> str:
-        """Generate a pricing table for available sub-models.
-        
-        Args:
-            sub_models: Model alias list (e.g., model_1, model_2) or real model name list
-            model_to_alias: Real model name -> alias mapping, used to query price
-        """
-        lines = ["| Model | Input $/1K | Output $/1K |"]
-        lines.append("|-------|-----------|------------|")
-        
-        # If mapping exists, need to reverse lookup real model name for pricing
-        alias_to_model = {v: k for k, v in model_to_alias.items()} if model_to_alias else {}
-        
-        for model_display in sub_models:
-            # Get real model name (for price lookup)
-            real_model = alias_to_model.get(model_display, model_display)
-            input_price = ModelPricing.get_price(real_model, "input")
-            output_price = ModelPricing.get_price(real_model, "output")
-            lines.append(f"| {model_display} | ${input_price:.5f} | ${output_price:.5f} |")
-        
-        return "\n".join(lines)
-    
-    @staticmethod
     def build_prompt(
         instruction: str,
         meta: Dict[str, Any],
-        tools_description: str,
         prior_context: str,
         attempt_index: int,
         max_attempts: int,
         sub_models: List[str],
         subtask_history: str = "",
         model_to_alias: Dict[str, str] = None,
+        tools: List[Any] = None,
     ) -> str:
-        remaining_attempts = max_attempts - attempt_index  # Remaining attempts after current one
-        model_pricing_table = GAIAMainAgentPrompt._build_model_pricing_table(sub_models, model_to_alias)
+        remaining_attempts = max_attempts - attempt_index
+        model_pricing_table = build_model_pricing_table(sub_models, model_to_alias)
+        tools_description = format_tools_description(tools or [])
         
         return f"""
 You are the MainAgent (Orchestrator). Your task is to solve the given QUESTION by decomposing it into subtasks and delegating each to a sub-agent.
@@ -114,7 +105,9 @@ If more work is NEEDED:
     "task_instruction": "A SPECIFIC, ACTIONABLE subtask (e.g., 'Extract second word from abstract of paper 2211.xxxxx')",
     "context": "Relevant findings from previous attempts",
     "model": "one of {sub_models}",
-    "tools": ["tool1", "tool2", "..."]
+    "tools": choose the potential tools from the {tools_description} to complete the subtask: ["tool1", "tool2", "..."],
   }}
 }}
+
+⚠️ Select relevant tools from AVAILABLE TOOLS section for the subtask.
 """.strip()

@@ -9,9 +9,29 @@ from pydantic import Field
 
 from base.agent.base_agent import BaseAgent
 from base.agent.memory import Memory
+from base.engine.async_llm import ModelPricing
 from base.engine.logs import logger, LogLevel
 from benchmark.common.env import BasicInfo
 from aorchestra.common.utils import parse_json_response, indent_text
+
+
+def build_model_pricing_table(
+    sub_models: List[str], 
+    model_to_alias: Dict[str, str] = None
+) -> str:
+    """Generate a pricing table for available sub-models."""
+    lines = ["| Model | Input $/1K | Output $/1K |"]
+    lines.append("|-------|-----------|------------|")
+    
+    alias_to_model = {v: k for k, v in model_to_alias.items()} if model_to_alias else {}
+    
+    for model_display in sub_models:
+        real_model = alias_to_model.get(model_display, model_display)
+        input_price = ModelPricing.get_price(real_model, "input")
+        output_price = ModelPricing.get_price(real_model, "output")
+        lines.append(f"| {model_display} | ${input_price:.5f} | ${output_price:.5f} |")
+    
+    return "\n".join(lines)
 
 
 class MainAgent(BaseAgent):
@@ -22,6 +42,7 @@ class MainAgent(BaseAgent):
     
     sub_models: List[str] = Field(default_factory=list)
     tools: List[Any] = Field(default_factory=list)
+    subagent_tools: List[Any] = Field(default_factory=list)  # Tools for SubAgent (used in prompt)
     prompt_builder: Optional[Any] = Field(default=None)
     max_attempts: int = Field(default=10)
     benchmark_type: str = Field(default="terminalbench")  # "gaia" | "terminalbench"
@@ -70,14 +91,6 @@ class MainAgent(BaseAgent):
     def get_usage_cost(self) -> float:
         return self.llm.get_usage_summary().get("total_cost", 0.0)
     
-    def _get_tools_description(self) -> str:
-        """Generate tool description text"""
-        if not self.tools:
-            return "No tools available."
-        return "\n\n".join([
-            f"{t.name}: {t.description}\nParams: {json.dumps(t.parameters, indent=2)}"
-            for t in self.tools
-        ])
     
     def _format_subtask_history(self) -> str:
         """Generate subtask history for prompt usage"""
@@ -159,13 +172,13 @@ class MainAgent(BaseAgent):
             prompt = self.prompt_builder.build_prompt(
                 instruction=self.instruction,
                 meta=self.meta,
-                tools_description=self._get_tools_description(),
                 prior_context=self.context,
                 attempt_index=self.attempt,
                 max_attempts=self.max_attempts,
                 sub_models=self.masked_sub_models,
                 subtask_history=subtask_history,
                 model_to_alias=self.model_to_alias if self.mask_model_names else None,
+                tools=self.subagent_tools,
             )
         else:
             prompt = self._default_prompt()
@@ -219,9 +232,6 @@ class MainAgent(BaseAgent):
     
     def _default_prompt(self) -> str:
         return f"""Task: {self.instruction}
-
-Tools:
-{self._get_tools_description()}
 
 Context:
 {self.context or 'First attempt'}

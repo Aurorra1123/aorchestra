@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 from typing import Any, Dict, List
 
 
@@ -15,13 +16,15 @@ def parse_json_response(resp: str) -> Dict[str, Any]:
         Parsed dict
     """
     s = resp.strip()
-    if s.startswith("```"):
-        lines = s.split("\n")
-        if lines[0].startswith("```"):
-            lines = lines[1:]
-        if lines and lines[-1].strip() == "```":
-            lines = lines[:-1]
-        s = "\n".join(lines)
+    if "```" in s:
+        match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", s, re.DOTALL)
+        if match:
+            s = match.group(1)
+    else:
+        start = s.find("{")
+        end = s.rfind("}")
+        if start != -1 and end != -1 and end > start:
+            s = s[start : end + 1]
     return json.loads(s)
 
 

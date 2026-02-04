@@ -177,6 +177,7 @@ class GAIARunner:
                         llm=main_llm,
                         sub_models=self.sub_models,
                         tools=[delegate_tool, complete_tool],
+                        subagent_tools=self.gaia_tools,
                         prompt_builder=GAIAMainAgentPrompt,
                         max_attempts=self.max_attempts,
                         benchmark_type="gaia",

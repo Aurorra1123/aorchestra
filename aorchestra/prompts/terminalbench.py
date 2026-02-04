@@ -1,45 +1,43 @@
 """TerminalBench prompts for MainAgent."""
 from typing import Any, Dict, List
 
-from base.engine.async_llm import ModelPricing
+from aorchestra.main_agent import build_model_pricing_table
+
+
+# TerminalBench SubAgent uses shell commands, not explicit tool objects
+TERMINALBENCH_TOOLS_DESCRIPTION = """
+SubAgent executes shell commands in a Docker container.
+
+Available actions for SubAgent:
+- execute: Run any shell command (bash, apt, pip, python, etc.)
+- finish: Report completion status to MainAgent
+
+Example commands SubAgent can run:
+- apt-get install <package>
+- pip install <package>
+- python script.py
+- cat /etc/config
+- systemctl status <service>
+""".strip()
 
 
 class TerminalBenchPrompt:
     """Build prompts for TerminalBench tasks."""
     
     @staticmethod
-    def _build_model_pricing_table(
-        sub_models: List[str], 
-        model_to_alias: Dict[str, str] = None
-    ) -> str:
-        """Generate a pricing table for available sub-models."""
-        lines = ["| Model | Input $/1K | Output $/1K |"]
-        lines.append("|-------|-----------|------------|")
-        
-        alias_to_model = {v: k for k, v in model_to_alias.items()} if model_to_alias else {}
-        
-        for model_display in sub_models:
-            real_model = alias_to_model.get(model_display, model_display)
-            input_price = ModelPricing.get_price(real_model, "input")
-            output_price = ModelPricing.get_price(real_model, "output")
-            lines.append(f"| {model_display} | ${input_price:.5f} | ${output_price:.5f} |")
-        
-        return "\n".join(lines)
-    
-    @staticmethod
     def build_prompt(
         instruction: str,
         meta: Dict[str, Any],
-        tools_description: str,
         prior_context: str,
         attempt_index: int,
         max_attempts: int,
         sub_models: List[str],
         subtask_history: str = "",
         model_to_alias: Dict[str, str] = None,
+        tools: List[Any] = None,
     ) -> str:
         remaining_attempts = max_attempts - attempt_index + 1
-        model_pricing_table = TerminalBenchPrompt._build_model_pricing_table(sub_models, model_to_alias)
+        model_pricing_table = build_model_pricing_table(sub_models, model_to_alias)
         
         # Budget warning
         if remaining_attempts <= 2:
@@ -82,7 +80,7 @@ CRITICAL: CONTAINER LIFECYCLE
 {subtask_history if subtask_history else "No subtasks completed yet."}
 
 ==== AVAILABLE TOOLS ====
-{tools_description}
+{TERMINALBENCH_TOOLS_DESCRIPTION}
 
 ==== OUTPUT ====
 Return JSON:

@@ -1,45 +1,54 @@
 """SWE-bench prompts for MainAgent."""
 from typing import Any, Dict, List
 
-from base.engine.async_llm import ModelPricing
+from aorchestra.main_agent import build_model_pricing_table
+
+
+# SWE-bench SubAgent uses ACI commands, not explicit tool objects
+SWEBENCH_TOOLS_DESCRIPTION = """
+SubAgent uses ACI (Agentic Code Interface) commands to navigate and edit code.
+
+=== FILE VIEWING ===
+- open <file> [line]: Open file at specified line
+- scroll_down/scroll_up: Navigate within open file
+- goto <line>: Jump to specific line
+
+=== FILE EDITING ===
+- str_replace <file>: Replace exact text match (preferred for edits)
+- edit <start>:<end>: Edit line range with syntax check
+- insert <file> <line>: Insert content after line
+- create <file>: Create new file
+
+=== SEARCHING ===
+- search_file <pattern> [file]: Search content in file
+- search_dir <pattern> [dir]: Search in directory
+- find_file <name> [dir]: Find files by name
+
+=== BASH ===
+- Any bash command (ls, cat, grep, python, pytest, etc.)
+
+=== SUBMIT ===
+- submit: Submit fix and run official tests
+""".strip()
 
 
 class SWEBenchMainAgentPrompt:
     """Build prompts for SWE-bench tasks (GitHub issue fixing)."""
     
     @staticmethod
-    def _build_model_pricing_table(
-        sub_models: List[str], 
-        model_to_alias: Dict[str, str] = None
-    ) -> str:
-        """Generate a pricing table for available sub-models."""
-        lines = ["| Model | Input $/1K | Output $/1K |"]
-        lines.append("|-------|-----------|------------|")
-        
-        alias_to_model = {v: k for k, v in model_to_alias.items()} if model_to_alias else {}
-        
-        for model_display in sub_models:
-            real_model = alias_to_model.get(model_display, model_display)
-            input_price = ModelPricing.get_price(real_model, "input")
-            output_price = ModelPricing.get_price(real_model, "output")
-            lines.append(f"| {model_display} | ${input_price:.5f} | ${output_price:.5f} |")
-        
-        return "\n".join(lines)
-    
-    @staticmethod
     def build_prompt(
         instruction: str,
         meta: Dict[str, Any],
-        tools_description: str,
         prior_context: str,
         attempt_index: int,
         max_attempts: int,
         sub_models: List[str],
         subtask_history: str = "",
         model_to_alias: Dict[str, str] = None,
+        tools: List[Any] = None,
     ) -> str:
         remaining_attempts = max_attempts - attempt_index + 1
-        model_pricing_table = SWEBenchMainAgentPrompt._build_model_pricing_table(sub_models, model_to_alias)
+        model_pricing_table = build_model_pricing_table(sub_models, model_to_alias)
         
         # Extract repository info from metadata
         repo = meta.get("repo", "unknown")
@@ -91,7 +100,7 @@ CRITICAL: SWE-BENCH CONTAINER BEHAVIOR
 {subtask_history if subtask_history else "No subtasks completed yet."}
 
 ==== AVAILABLE TOOLS ====
-{tools_description}
+{SWEBENCH_TOOLS_DESCRIPTION}
 
 ==== OUTPUT ====
 Return JSON:
